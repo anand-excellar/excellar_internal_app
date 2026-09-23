@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{{ dashboard.name }} is offline{% endblock %}
+
+{% block content %}
+<div class="form-narrow">
+    <div class="page-head">
+        <h1>{{ dashboard.name }} isn&rsquo;t responding</h1>
+        <p>The portal is running, but nothing answered on the dashboard&rsquo;s own service.</p>
+    </div>
+
+    <div class="card card-pad">
+        <div class="alert alert-warning">
+            No response from <code>{{ dashboard.upstream_root }}</code> — the dashboard&rsquo;s
+            process is most likely not started.
+        </div>
+
+        {% if user.is_staff %}
+            <pre class="trace">{{ error }}</pre>
+        {% endif %}
+
+        <div class="form-actions">
+            <a href="{{ dashboard.path }}" class="btn btn-primary">Try again</a>
+            <a href="{% url 'picker' %}" class="btn btn-secondary">Back to dashboards</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

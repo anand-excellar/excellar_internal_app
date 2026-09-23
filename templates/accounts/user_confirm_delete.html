@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Delete {{ target.username }}{% endblock %}
+
+{% block content %}
+<div class="form-narrow">
+    <div class="page-head">
+        <h1>Delete {{ target.username }}?</h1>
+    </div>
+
+    <div class="card card-pad">
+        <div class="alert alert-error">
+            This removes the account permanently and cannot be undone.
+        </div>
+        <p class="cell-muted" style="margin:0">
+            If you only want to stop them signing in,
+            <a href="{% url 'user-edit' target.pk %}">edit the account</a>
+            and clear &ldquo;Active&rdquo; instead — that keeps the record and can be reversed.
+        </p>
+
+        <form method="post" class="form-actions">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete permanently</button>
+            <a href="{% url 'user-list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

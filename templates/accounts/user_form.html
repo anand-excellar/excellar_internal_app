@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="form-narrow">
+    <div class="page-head">
+        <h1>{{ title }}</h1>
+    </div>
+
+    <div class="card card-pad">
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-error">
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="field{% if field.field.widget.input_type == 'checkbox' %} field-check{% endif %}">
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                        <label for="{{ field.id_for_label }}">{{ field }} {{ field.label }}</label>
+                    {% else %}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                    {% endif %}
+                    {% if field.help_text %}<div class="help">{{ field.help_text|safe }}</div>{% endif %}
+                    {% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">{{ submit }}</button>
+                <a href="{{ cancel_url|default_if_none:''|default:'/users/' }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

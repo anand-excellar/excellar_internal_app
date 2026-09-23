@@ -1,0 +1,159 @@
+{# [DEBUG] PnL Calculation Breakdown — remove before production #}
+
+<div class="space-y-6">
+{% for row in rows %}
+<div class="rounded-xl border border-yellow-900/50 bg-gray-950 overflow-hidden">
+
+    {# --- Header --- #}
+    <div class="flex items-center justify-between px-4 py-2 bg-yellow-950/40 border-b border-yellow-900/50">
+        <span class="text-yellow-400 font-semibold text-sm uppercase tracking-widest">{{ row.segment }}</span>
+        <span class="text-yellow-700 text-xs font-mono">debug · not for production</span>
+    </div>
+
+    <div class="overflow-x-auto">
+    <table class="w-full text-xs font-mono">
+        <thead>
+            <tr class="border-b border-gray-800 text-gray-500 uppercase tracking-wider text-left">
+                <th class="px-3 py-2 w-40">Field</th>
+                <th class="px-3 py-2 text-blue-500/70">
+                    Reference snapshot<br>
+                    <span class="text-gray-600 normal-case font-normal">
+                        {% if row.ref_ts %}{{ row.ref_ts|date:"Y-m-d H:i" }} UTC{% else %}—{% endif %}
+                    </span>
+                </th>
+                <th class="px-3 py-2 text-green-500/70">
+                    Current snapshot<br>
+                    <span class="text-gray-600 normal-case font-normal">
+                        {% if row.cur_ts %}{{ row.cur_ts|date:"Y-m-d H:i" }} UTC{% else %}—{% endif %}
+                    </span>
+                </th>
+                <th class="px-3 py-2 text-purple-400/70">Delta / Value</th>
+                <th class="px-3 py-2 text-gray-500">Notes</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-800/60">
+
+            {# AAVE Borrow #}
+            <tr class="hover:bg-gray-900/40">
+                <td class="px-3 py-2 text-gray-400">AAVE Borrow (USDC)</td>
+                <td class="px-3 py-2 text-blue-300">{% if row.ref_aave_borrow != None %}{{ row.ref_aave_borrow|floatformat:4 }}{% else %}—{% endif %}</td>
+                <td class="px-3 py-2 text-green-300">{% if row.cur_aave_borrow != None %}{{ row.cur_aave_borrow|floatformat:4 }}{% else %}—{% endif %}</td>
+                <td class="px-3 py-2 {% if row.aave_delta != None and row.aave_delta >= 0 %}text-green-400{% elif row.aave_delta != None %}text-red-400{% else %}text-gray-600{% endif %}">
+                    {% if row.aave_delta != None %}{% if row.aave_delta >= 0 %}+{% endif %}{{ row.aave_delta|floatformat:4 }}{% else %}—{% endif %}
+                </td>
+                <td class="px-3 py-2 text-gray-600">ref − cur (reduction = profit)</td>
+            </tr>
+
+            {# AAVE Collateral / Supply — informational (principal, NOT in PnL) #}
+            <tr class="hover:bg-gray-900/40">
+                <td class="px-3 py-2 text-gray-400">AAVE Collateral (USD)</td>
+                <td class="px-3 py-2 text-blue-300">{% if row.ref_aave_supply != None %}{{ row.ref_aave_supply|floatformat:2 }}{% else %}—{% endif %}</td>
+                <td class="px-3 py-2 text-green-300">{% if row.cur_aave_supply != None %}{{ row.cur_aave_supply|floatformat:2 }}{% else %}—{% endif %}</td>
+                <td class="px-3 py-2 text-gray-500">—</td>
+                <td class="px-3 py-2 text-gray-600">principal — not in PnL</td>
+            </tr>
+
+            {# AAVE Health Factor — informational (risk metric, NOT in PnL) #}
+            <tr class="hover:bg-gray-900/40">
+                <td class="px-3 py-2 text-gray-400">AAVE Health Factor</td>
+                <td class="px-3 py-2 text-blue-300">{% if row.ref_health != None %}{{ row.ref_health|floatformat:2 }}{% else %}—{% endif %}</td>
+                <td class="px-3 py-2 {% if row.cur_health != None and row.cur_health < 1 %}text-red-400{% elif row.cur_health != None %}text-green-300{% else %}text-gray-500{% endif %}">
+                    {% if row.cur_health != None %}{{ row.cur_health|floatformat:2 }}{% else %}—{% endif %}
+                </td>
+                <td class="px-3 py-2 text-gray-500">—</td>
+                <td class="px-3 py-2 text-gray-600">&lt;1 = liquidatable · not in PnL</td>
+            </tr>
+
+            {# sUSDS ETH #}
+            <tr class="hover:bg-gray-900/40 {% if row.segment != 'xlUSD' %}opacity-30{% endif %}">
+                <td class="px-3 py-2 text-gray-400">sUSDS ETH (USD)</td>
+                <td class="px-3 py-2 text-blue-300">{% if row.ref_susds_eth != None %}{{ row.ref_susds_eth|floatformat:4 }}{% else %}—{% endif %}</td>
+                <td class="px-3 py-2 text-green-300">{% if row.cur_susds_eth != None %}{{ row.cur_susds_eth|floatformat:4 }}{% else %}—{% endif %}</td>
+                <td class="px-3 py-2 {% if row.susds_eth_delta != None and row.susds_eth_delta >= 0 %}text-green-400{% elif row.susds_eth_delta != None %}text-red-400{% else %}text-gray-600{% endif %}">
+                    {% if row.susds_eth_delta != None %}{% if row.susds_eth_delta >= 0 %}+{% endif %}{{ row.susds_eth_delta|floatformat:4 }}{% else %}—{% endif %}
+                </td>
+                <td class="px-3 py-2 text-gray-600">{% if row.segment == 'xlUSD' %}cur − ref{% else %}not in PnL for this segment{% endif %}</td>
+            </tr>
+
+            {# sUSDS Arbi #}
+            <tr class="hover:bg-gray-900/40 {% if row.segment != 'xlUSD' %}opacity-30{% endif %}">
+                <td class="px-3 py-2 text-gray-400">sUSDS Arbi (USD)</td>
+                <td class="px-3 py-2 text-blue-300">{% if row.ref_susds_arbi != None %}{{ row.ref_susds_arbi|floatformat:4 }}{% else %}—{% endif %}</td>
+                <td class="px-3 py-2 text-green-300">{% if row.cur_susds_arbi != None %}{{ row.cur_susds_arbi|floatformat:4 }}{% else %}—{% endif %}</td>
+                <td class="px-3 py-2 {% if row.susds_arbi_delta != None and row.susds_arbi_delta >= 0 %}text-green-400{% elif row.susds_arbi_delta != None %}text-red-400{% else %}text-gray-600{% endif %}">
+                    {% if row.susds_arbi_delta != None %}{% if row.susds_arbi_delta >= 0 %}+{% endif %}{{ row.susds_arbi_delta|floatformat:4 }}{% else %}—{% endif %}
+                </td>
+                <td class="px-3 py-2 text-gray-600">{% if row.segment == 'xlUSD' %}cur − ref{% else %}not in PnL for this segment{% endif %}</td>
+            </tr>
+
+            {# Cross-MtM #}
+            <tr class="hover:bg-gray-900/40">
+                <td class="px-3 py-2 text-gray-400">Cross-MtM Value</td>
+                <td class="px-3 py-2 text-blue-300">
+                    {% if row.ref_cross_mtm != None %}{{ row.ref_cross_mtm|floatformat:6 }}{% else %}—{% endif %}
+                    {% if row.ref_price_diff != None %}<br><span class="text-gray-600">diff={{ row.ref_price_diff|floatformat:4 }}</span>{% endif %}
+                </td>
+                <td class="px-3 py-2 text-green-300">
+                    {% if row.cur_cross_mtm != None %}{{ row.cur_cross_mtm|floatformat:6 }}{% else %}—{% endif %}
+                    {% if row.cur_price_diff != None %}
+                        <br><span class="text-gray-600">diff={{ row.cur_price_diff|floatformat:4 }}</span>
+                    {% endif %}
+                    {% if row.cross_mtm_direction_label %}
+                        <br><span class="text-gray-600">dir={{ row.cross_mtm_direction_label }}</span>
+                    {% endif %}
+                </td>
+                <td class="px-3 py-2 {% if row.cross_mtm_delta != None and row.cross_mtm_delta >= 0 %}text-green-400{% elif row.cross_mtm_delta != None %}text-red-400{% else %}text-gray-600{% endif %}">
+                    {% if row.cross_mtm_delta != None %}{% if row.cross_mtm_delta >= 0 %}+{% endif %}{{ row.cross_mtm_delta|floatformat:6 }}{% else %}—{% endif %}
+                </td>
+                <td class="px-3 py-2 text-gray-600">entry_cost − (diff × size)</td>
+            </tr>
+
+            {# Funding #}
+            <tr class="hover:bg-gray-900/40">
+                <td class="px-3 py-2 text-gray-400">Funding (today)</td>
+                <td class="px-3 py-2 text-gray-600" colspan="2">cumulative since 00:00 UTC</td>
+                <td class="px-3 py-2 {% if row.funding_today != None and row.funding_today >= 0 %}text-green-400{% elif row.funding_today != None %}text-red-400{% else %}text-gray-600{% endif %}">
+                    {% if row.funding_today != None %}{% if row.funding_today >= 0 %}+{% endif %}{{ row.funding_today|floatformat:6 }}{% else %}—{% endif %}
+                </td>
+                <td class="px-3 py-2 text-gray-600">from exchanges</td>
+            </tr>
+
+            {# Net PnL summary row #}
+            <tr class="border-t-2 border-yellow-900/60 bg-gray-900/50 font-semibold">
+                <td class="px-3 py-2 text-yellow-300 uppercase tracking-wider text-xs">Net PnL (USDC)</td>
+                <td class="px-3 py-2 text-gray-600" colspan="2">aave{% if row.segment == 'xlUSD' %} + sUSDS{% endif %} + funding + cross_mtm</td>
+                <td class="px-3 py-2 text-base {% if row.net_pnl != None and row.net_pnl >= 0 %}text-green-400{% elif row.net_pnl != None %}text-red-400{% else %}text-gray-600{% endif %}">
+                    {% if row.net_pnl != None %}{% if row.net_pnl >= 0 %}+{% endif %}{{ row.net_pnl|floatformat:6 }}{% else %}—{% endif %}
+                </td>
+                <td class="px-3 py-2 text-gray-600">
+                    snap: {% if row.snap_pnl != None %}{% if row.snap_pnl >= 0 %}+{% endif %}{{ row.snap_pnl|floatformat:6 }}{% else %}—{% endif %}
+                </td>
+            </tr>
+
+            {# NAV reconciliation: ΔNAV vs component PnL #}
+            <tr class="hover:bg-gray-900/40">
+                <td class="px-3 py-2 text-gray-400">NAV (catalog, USD)</td>
+                <td class="px-3 py-2 text-blue-300">{% if row.nav_ref != None %}{{ row.nav_ref|floatformat:2 }}{% else %}—{% endif %}</td>
+                <td class="px-3 py-2 text-green-300">{% if row.nav_now != None %}{{ row.nav_now|floatformat:2 }}{% else %}—{% endif %}</td>
+                <td class="px-3 py-2 {% if row.delta_nav != None and row.delta_nav >= 0 %}text-green-400{% elif row.delta_nav != None %}text-red-400{% else %}text-gray-600{% endif %}">
+                    ΔNAV {% if row.delta_nav != None %}{% if row.delta_nav >= 0 %}+{% endif %}{{ row.delta_nav|floatformat:2 }}{% else %}—{% endif %}
+                </td>
+                <td class="px-3 py-2 text-gray-600">reference → current</td>
+            </tr>
+            <tr class="bg-gray-900/50">
+                <td class="px-3 py-2 text-yellow-300 uppercase tracking-wider text-xs">Reconcile</td>
+                <td class="px-3 py-2 text-gray-600" colspan="2">ΔNAV − component PnL = unexplained (deposits / price moves)</td>
+                <td class="px-3 py-2 {% if row.nav_gap != None and row.nav_gap|floatformat:2 == '0.00' %}text-green-400{% elif row.nav_gap != None %}text-yellow-400{% else %}text-gray-600{% endif %}">
+                    gap {% if row.nav_gap != None %}{% if row.nav_gap >= 0 %}+{% endif %}{{ row.nav_gap|floatformat:2 }}{% else %}—{% endif %}
+                </td>
+                <td class="px-3 py-2 text-gray-600">≈0 ⇒ ties out</td>
+            </tr>
+
+        </tbody>
+    </table>
+    </div>
+</div>
+{% empty %}
+<p class="text-gray-600 text-sm">No snapshot data available.</p>
+{% endfor %}
+</div>

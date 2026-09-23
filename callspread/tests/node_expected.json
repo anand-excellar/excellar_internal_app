@@ -1,0 +1,344 @@
+{
+  "snapshot": {
+    "asOf": "2026-08-07T14:01:36.023Z",
+    "source": "live",
+    "baseCurrency": "CC",
+    "quoteCurrency": "USDT",
+    "spot": 0.090590159775,
+    "legs": [
+      {
+        "code": "STS-CC-USDT-CC-20260821-0.135-C-E-V",
+        "label": "CC-USDT-21AUG26-0.135-C",
+        "side": "SHORT",
+        "strike": 0.135,
+        "optionType": "C",
+        "exerciseStyle": "E",
+        "expiry": "2026-08-21T08:00:00.000Z",
+        "daysToExpiry": 13.7489096446331,
+        "accountName": "REDACTED",
+        "quantity": -10000,
+        "spot": 0.090590159775,
+        "isITM": false,
+        "moneyness": -0.3289617794444445,
+        "markValue": -1.0199423814669224,
+        "markPerContract": 0.00010199423814669224,
+        "usd": {
+          "delta": -16.38868607069416,
+          "gamma": -2.212798498662691,
+          "vega": -0.07814092397036204,
+          "theta": 0.2677883393890324,
+          "rho": -0.005785173676200105,
+          "vanna": -0.009775124653604073,
+          "volga": -0.003973009260583317
+        },
+        "raw": {
+          "delta": 0.018091022370861208,
+          "gamma": 2.6963720509829123,
+          "vega": 7.814092397036204e-06,
+          "theta": -2.677883393890324e-05,
+          "rho": 5.785173676200105e-07,
+          "vanna": 9.775124653604074e-07,
+          "volga": 3.973009260583317e-07
+        },
+        "deltaCcUnits": -180.91022370861208
+      },
+      {
+        "code": "STS-CC-USDT-CC-20260821-0.15-C-E-V",
+        "label": "CC-USDT-21AUG26-0.15-C",
+        "side": "LONG",
+        "strike": 0.15,
+        "optionType": "C",
+        "exerciseStyle": "E",
+        "expiry": "2026-08-21T08:00:00.000Z",
+        "daysToExpiry": 13.7489096443993,
+        "accountName": "REDACTED",
+        "quantity": 10000,
+        "spot": 0.090590159775,
+        "isITM": false,
+        "moneyness": -0.39606560150000003,
+        "markValue": 10.273885253379923,
+        "markPerContract": 0.0010273885253379922,
+        "usd": {
+          "delta": 3.669075223172167,
+          "gamma": 0.5908657249690292,
+          "vega": 0.02105616177940088,
+          "theta": -0.072763843296306,
+          "rho": 0.0013064509547456413,
+          "vanna": 0.003246006173280659,
+          "volga": 0.001667565294344548
+        },
+        "raw": {
+          "delta": 0.004050191800395428,
+          "gamma": 0.719990468021872,
+          "vega": 2.105616177940088e-06,
+          "theta": -7.2763843296306005e-06,
+          "rho": 1.3064509547456412e-07,
+          "vanna": 3.246006173280659e-07,
+          "volga": 1.667565294344548e-07
+        },
+        "deltaCcUnits": 40.50191800395427
+      }
+    ],
+    "optionsUsd": {
+      "delta": -12.719610847521993,
+      "gamma": -1.6219327736936617,
+      "vega": -0.05708476219096116,
+      "theta": 0.1950244960927264,
+      "rho": -0.004478722721454463,
+      "vanna": -0.006529118480323414,
+      "volga": -0.0023054439662387686
+    },
+    "coverage": {
+      "marginPostedUnits": 1000,
+      "custodyUnits": 9000,
+      "pendingUnits": 239.72640520712673,
+      "unconvertedQuote": 21.71685335,
+      "totalCcHeld": 10239.726405207126,
+      "ccReserved": 10000,
+      "availableToWrite": 239.72640520712594,
+      "coverageRatio": 1.0239726405207126,
+      "covered": true
+    },
+    "aggregation": {
+      "sources": [
+        {
+          "key": "options",
+          "label": "STS options book",
+          "delta": -12.719610847521993,
+          "gamma": -1.6219327736936617,
+          "vega": -0.05708476219096116,
+          "theta": 0.1950244960927264,
+          "rho": -0.004478722721454463,
+          "units": null
+        },
+        {
+          "key": "margin",
+          "label": "Margin posted at STS",
+          "delta": 90.590159775,
+          "gamma": 0,
+          "vega": 0,
+          "theta": 0,
+          "rho": 0,
+          "units": 1000
+        },
+        {
+          "key": "custody",
+          "label": "Undeployed CC \u2014 Custody (BitGo)",
+          "delta": 815.311437975,
+          "gamma": 0,
+          "vega": 0,
+          "theta": 0,
+          "rho": 0,
+          "units": 9000
+        },
+        {
+          "key": "pending",
+          "label": "CC pending conversion",
+          "delta": 21.71685335,
+          "gamma": 0,
+          "vega": 0,
+          "theta": 0,
+          "rho": 0,
+          "units": 239.72640520712673
+        }
+      ],
+      "portfolio": {
+        "delta": 914.898840252478,
+        "gamma": -1.6219327736936617,
+        "vega": -0.05708476219096116,
+        "theta": 0.1950244960927264,
+        "rho": -0.004478722721454463
+      }
+    },
+    "deltaMonitor": {
+      "totalDeltaUsd": 914.898840252478,
+      "netDeltaCcUnits": 10099.318099502469,
+      "totalCcHeld": 10239.726405207126,
+      "blendedDelta": 0.9862878850324305,
+      "hardFloor": 0.7,
+      "warningBuffer": 0.02,
+      "target": 0.8,
+      "upperBand": 0.95,
+      "distanceToFloor": 0.2862878850324305,
+      "distanceToTarget": 0.18628788503243043,
+      "status": "serious",
+      "statusText": "Above upper band \u2014 coverage under-utilised, room to write",
+      "rebalance": {
+        "addSpotCcUnits": -9537.684876683841,
+        "buyBackShortContracts": -105441.08211425316
+      }
+    },
+    "spread": {
+      "shortStrike": 0.135,
+      "longStrike": 0.15,
+      "contracts": 10000,
+      "width": 0.014999999999999986,
+      "netCredit": 21.730000000000004,
+      "creditPerContract": 0.0021730000000000005,
+      "maxProfit": 21.730000000000004,
+      "maxLoss": 128.26999999999987,
+      "breakeven": 0.13717300000000002,
+      "netMarkValue": 9.253942871913,
+      "totalPnl": 30.983942871913005,
+      "distanceToShortStrike": -0.3289617794444445,
+      "daysToExpiry": 13.7489096446331,
+      "marksInverted": true
+    },
+    "roll": {
+      "rollDaysBeforeExpiry": 14,
+      "approachDays": 3,
+      "expiry": "2026-08-21T08:00:00.000Z",
+      "rollDate": "2026-08-07T08:00:00.000Z",
+      "daysToExpiry": 13.7489096446331,
+      "daysToRoll": -0.25109035536689994,
+      "rollFraction": 0,
+      "status": "serious",
+      "statusText": "Roll window open \u2014 due 0.3d ago",
+      "closeProceeds": 9.253942871913,
+      "realisedIfClosedNow": 30.983942871913005,
+      "legsToClose": [
+        {
+          "label": "CC-USDT-21AUG26-0.135-C",
+          "action": "BUY TO CLOSE",
+          "quantity": 10000,
+          "markPerContract": 0.00010199423814669224,
+          "cashflow": -1.0199423814669224
+        },
+        {
+          "label": "CC-USDT-21AUG26-0.15-C",
+          "action": "SELL TO CLOSE",
+          "quantity": 10000,
+          "markPerContract": 0.0010273885253379922,
+          "cashflow": 10.273885253379923
+        }
+      ],
+      "marksReliable": false
+    },
+    "pnl": {
+      "realized": 21.730000000000004,
+      "unrealized": 9.253942871913,
+      "total": 30.983942871913005,
+      "realizedSource": "trades",
+      "legs": [
+        {
+          "label": "CC-USDT-21AUG26-0.135-C",
+          "code": "STS-CC-USDT-CC-20260821-0.135-C-E-V",
+          "side": "SHORT",
+          "strike": 0.135,
+          "quantity": -10000,
+          "open": true,
+          "entryPrice": 0.006145,
+          "realized": 61.45,
+          "unrealized": -1.0199423814669224,
+          "markPerContract": 0.00010199423814669224,
+          "total": 60.430057618533084,
+          "openedAt": "2026-07-21T19:08:13.977Z"
+        },
+        {
+          "label": "CC-USDT-21AUG26-0.15-C",
+          "code": "STS-CC-USDT-CC-20260821-0.15-C-E-V",
+          "side": "LONG",
+          "strike": 0.15,
+          "quantity": 10000,
+          "open": true,
+          "entryPrice": 0.003972,
+          "realized": -39.72,
+          "unrealized": 10.273885253379923,
+          "markPerContract": 0.0010273885253379922,
+          "total": -29.446114746620076,
+          "openedAt": "2026-07-21T19:08:43.701Z"
+        }
+      ],
+      "tradeCount": 2,
+      "underlying": {
+        "referenceSpot": null,
+        "units": 10239.726405207126,
+        "spotChangePnl": null,
+        "acquisitionCost": 0.0,
+        "total": null
+      },
+      "portfolioTotal": null
+    }
+  },
+  "history": {
+    "t": "2026-08-07T14:01:36.023Z",
+    "spot": 0.090590159775,
+    "delta": 914.898840252478,
+    "optionsDelta": -12.719610847521993,
+    "spotDelta": 927.6184510999999,
+    "gamma": -1.6219327736936617,
+    "vega": -0.05708476219096116,
+    "theta": 0.1950244960927264,
+    "rho": -0.004478722721454463,
+    "blended": 0.9862878850324305,
+    "netUnits": 10099.318099502469,
+    "totalCc": 10239.726405207126,
+    "available": 239.72640520712594,
+    "realizedPnl": 21.730000000000004,
+    "unrealizedPnl": 9.253942871913,
+    "totalPnl": 30.983942871913005,
+    "pnl": 30.983942871913005,
+    "markValue": 9.253942871913,
+    "legs": [
+      {
+        "k": "CC-USDT-21AUG26-0.135-C",
+        "q": -10000,
+        "d": -16.38868607069416,
+        "g": -2.212798498662691,
+        "v": -0.07814092397036204,
+        "th": 0.2677883393890324,
+        "rd": 0.018091022370861208,
+        "dte": 13.7489096446331
+      },
+      {
+        "k": "CC-USDT-21AUG26-0.15-C",
+        "q": 10000,
+        "d": 3.669075223172167,
+        "g": 0.5908657249690292,
+        "v": 0.02105616177940088,
+        "th": -0.072763843296306,
+        "rd": 0.004050191800395428,
+        "dte": 13.7489096443993
+      }
+    ],
+    "underlyingPnl": null,
+    "portfolioPnl": null
+  },
+  "rules": [
+    {
+      "id": "delta-floor",
+      "name": "Blended delta vs hard floor",
+      "state": "good",
+      "detail": "floor 70.00% \u00b7 target 80.00%",
+      "value": "98.63%"
+    },
+    {
+      "id": "coverage",
+      "name": "Written calls covered 1:1",
+      "state": "good",
+      "detail": "10,000 reserved of 10,240 held",
+      "value": "240 CC free"
+    },
+    {
+      "id": "short-strike",
+      "name": "Spot approaching the short strike",
+      "state": "good",
+      "detail": "short strike 0.135",
+      "value": "-32.90%"
+    },
+    {
+      "id": "roll-window",
+      "name": "Roll window",
+      "state": "warning",
+      "detail": "roll 14d before expiry \u2014 by 2026-08-07",
+      "value": "0.3d overdue"
+    },
+    {
+      "id": "mark-sanity",
+      "name": "Option marks self-consistent",
+      "state": "warning",
+      "detail": "lower strike must mark above the higher strike",
+      "value": "crossed"
+    }
+  ]
+}

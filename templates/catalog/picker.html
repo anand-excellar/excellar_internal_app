@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboards{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <h1>Welcome back, {{ user.first_name|default:user.get_username }}</h1>
+    <p>Choose a dashboard to open.</p>
+</div>
+
+{% if dashboards %}
+<div class="dash-grid">
+    {% for dash in dashboards %}
+    <a class="dash-card" href="{{ dash.path }}">
+        <div class="dash-top">
+            <div class="dash-body">
+                <span class="dash-icon">{{ dash.icon|default:"&#9678;" }}</span>
+                <div>
+                    <h2>{{ dash.name }}</h2>
+                    <p>{{ dash.description }}</p>
+                </div>
+            </div>
+            <span class="chip status-badge" data-slug="{{ dash.slug }}">
+                <span class="dot"></span>checking
+            </span>
+        </div>
+        <div class="dash-open">Open dashboard &rarr;</div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card notice">
+    <p>No dashboards are configured yet.</p>
+    {% if user.is_staff %}
+        <p class="help">
+            Run <code>python manage.py seed_dashboards</code>, or
+            <a href="/admin/catalog/dashboard/">add one in admin</a>.
+        </p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Probed after render so a slow or stopped dashboard never delays this page.
+fetch("{% url 'dashboard-status' %}")
+    .then(function (r) { return r.json(); })
+    .then(function (state) {
+        document.querySelectorAll('.status-badge').forEach(function (el) {
+            var up = state[el.dataset.slug];
+            if (up === undefined) { el.remove(); return; }
+            el.className = 'chip status-badge ' + (up ? 'chip-live' : 'chip-down');
+            el.innerHTML = '<span class="dot"></span>' + (up ? 'live' : 'offline');
+        });
+    })
+    .catch(function () {
+        document.querySelectorAll('.status-badge').forEach(function (el) { el.remove(); });
+    });
+</script>
+{% endblock %}

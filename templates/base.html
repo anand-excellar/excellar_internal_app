@@ -1,0 +1,54 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboards{% endblock %} &middot; Excellar</title>
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" sizes="any">
+    <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/portal.css' %}">
+</head>
+<body>
+<header class="site-header">
+    <a class="brand" href="{% url 'picker' %}">
+        <img src="{% static 'img/excellar.png' %}" alt="Excellar">
+        <span class="wordmark">EXCELLAR</span>
+        <span class="brand-sub">Dashboards</span>
+    </a>
+
+    {% if user.is_authenticated %}
+    <nav class="site-nav">
+        {% if user.is_staff %}
+            <a href="{% url 'user-list' %}">Users</a>
+            <a href="/admin/">Admin</a>
+        {% endif %}
+        <a class="who" href="{% url 'change-own-password' %}" title="Change your password">
+            <span class="avatar">{{ user.get_username|slice:":2" }}</span>
+            {{ user.get_short_name|default:user.get_username }}
+        </a>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary btn-sm">Sign out</button>
+        </form>
+    </nav>
+    {% endif %}
+</header>
+
+<main class="{% block main_class %}{% endblock %}">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'success' }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    Excellar &middot; Internal dashboards. Sign in once &mdash; every dashboard is served through this portal.
+</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

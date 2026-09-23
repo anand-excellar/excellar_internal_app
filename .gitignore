@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+data/*.sqlite3
+data/nav_report/credentialsNAV.json
+data/nav_report/token_summary.pickle
+staticfiles/
+data/callspread/history.jsonl
+data/callspread/latest.json
+.claude/scheduled_tasks.lock
+.pytest_cache/

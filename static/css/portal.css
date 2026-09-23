@@ -1,0 +1,434 @@
+/* Dashboard Portal — styled to match excellar.finance.
+ *
+ * Values here are taken from the live site rather than approximated: the
+ * wordmark and headings use its navy→blue→cyan text gradient, primary actions
+ * use its blue CTA gradient, and the neutrals are its Atlassian-derived scale.
+ * Self-hosted rather than a CDN build, so the portal renders identically with
+ * no external request — it is the login page for everything else, and it should
+ * not depend on a third party being reachable.
+ */
+
+:root {
+    /* Brand — sampled from excellar.finance */
+    --navy:        #172B4D;   /* primary text, wordmark start */
+    --navy-deep:   #091E42;   /* headings */
+    --blue:        #0052CC;   /* primary action */
+    --blue-dark:   #0747A6;   /* CTA gradient end */
+    --cyan:        #00B8D9;   /* wordmark / heading gradient end */
+    --green:       #00875A;   /* success, "live" */
+    --amber:       #974F0C;   /* warning, "offline" */
+    --red:         #AE2E24;   /* destructive */
+
+    /* Neutrals */
+    --text:        #172B4D;
+    --text-muted:  #5E6C84;
+    --text-subtle: #8993A4;
+    --border:      #DFE1E6;
+    --border-hard: #C1C7D0;
+    --surface:     #FFFFFF;
+    --surface-alt: #F4F5F7;
+    --surface-sunk:#FAFBFC;
+
+    /* Tints for status chips */
+    --green-bg:    #E3FCEF;
+    --green-line:  #ABF5D1;
+    --amber-bg:    #FFF7D6;
+    --amber-line:  #F8E6A0;
+    --red-bg:      #FFEDEB;
+    --red-line:    #FFD5D2;
+    --blue-bg:     #DEEBFF;
+    --blue-line:   #B3D4FF;
+
+    --radius:      8px;
+    --radius-lg:   12px;
+    --shadow-sm:   0 1px 2px rgba(9, 30, 66, 0.08);
+    --shadow:      0 4px 12px rgba(9, 30, 66, 0.10);
+    --shadow-cta:  0 12px 32px rgba(0, 82, 204, 0.12);
+
+    --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            "Helvetica Neue", Arial, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--surface);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* --- brand ---------------------------------------------------------------- */
+
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand:hover { text-decoration: none; }
+.brand img { width: 28px; height: 32px; object-fit: contain; }
+
+.wordmark {
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    /* The site clips this gradient to the glyphs; the solid colour is the
+       fallback for anything that cannot do background-clip. */
+    color: var(--navy);
+    background: linear-gradient(to right, var(--navy), var(--blue), var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+    .wordmark { color: transparent; }
+}
+
+.brand-sub {
+    color: var(--text-subtle);
+    font-size: 13px;
+    font-weight: 500;
+    padding-left: 11px;
+    margin-left: 1px;
+    border-left: 1px solid var(--border);
+}
+
+/* --- chrome --------------------------------------------------------------- */
+
+.site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 32px;
+    height: 68px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.site-nav { display: flex; align-items: center; gap: 22px; font-size: 14px; }
+.site-nav a { color: var(--text-muted); font-weight: 500; }
+.site-nav a:hover { color: var(--navy); text-decoration: none; }
+.site-nav form { display: inline; margin: 0; }
+
+.who {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--text-muted); font-weight: 500;
+}
+.avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--blue-bg); color: var(--blue-dark);
+    font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+    display: inline-flex; align-items: center; justify-content: center;
+    text-transform: uppercase;
+}
+
+main { flex: 1; width: 100%; max-width: 1040px; margin: 0 auto; padding: 40px 32px 56px; }
+main.wide { max-width: 1240px; }
+
+.site-footer {
+    border-top: 1px solid var(--border);
+    padding: 16px 32px;
+    font-size: 12.5px;
+    color: var(--text-subtle);
+    background: var(--surface-sunk);
+}
+
+/* --- page headings -------------------------------------------------------- */
+
+.page-head { margin-bottom: 28px; }
+.page-head h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: var(--navy-deep);
+}
+.page-head p { margin: 6px 0 0; color: var(--text-muted); font-size: 14.5px; }
+
+.head-row {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 20px; flex-wrap: wrap; margin-bottom: 28px;
+}
+.head-row .page-head { margin-bottom: 0; }
+
+/* --- buttons -------------------------------------------------------------- */
+
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 9px 18px;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease,
+                box-shadow .15s ease, color .15s ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.btn:hover { text-decoration: none; }
+.btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+.btn-primary {
+    color: #FFF;
+    background: linear-gradient(to right, var(--blue), var(--blue-dark));
+    box-shadow: var(--shadow-cta);
+}
+.btn-primary:hover { background: linear-gradient(to right, var(--blue-dark), #063A87); color: #FFF; }
+
+.btn-secondary {
+    color: var(--text); background: var(--surface); border-color: var(--border-hard);
+}
+.btn-secondary:hover { background: var(--surface-alt); border-color: var(--text-subtle); }
+
+.btn-danger { color: #FFF; background: var(--red); }
+.btn-danger:hover { background: #8E1F1B; color: #FFF; }
+
+.btn-sm { padding: 6px 13px; font-size: 13px; }
+
+/* --- cards ---------------------------------------------------------------- */
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+.card-pad { padding: 24px; }
+
+/* --- dashboard picker ----------------------------------------------------- */
+
+.dash-grid {
+    display: grid;
+    /* auto-fit, not auto-fill: with two dashboards an auto-fill grid reserves a
+       third empty column and squeezes both cards into a third of the width. */
+    grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: 18px;
+}
+
+.dash-card {
+    position: relative;
+    display: block;
+    padding: 22px 22px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+/* The brand's teal→lime accent, used as a hover reveal so the card reads as
+   part of the same family as the logo without competing with the content. */
+.dash-card::before {
+    content: "";
+    position: absolute; inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #01AC99, #51BA68, #BDD631);
+    opacity: 0;
+    transition: opacity .16s ease;
+}
+.dash-card:hover {
+    border-color: var(--border-hard);
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+.dash-card:hover::before { opacity: 1; }
+
+.dash-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.dash-icon {
+    width: 38px; height: 38px; flex: none;
+    border-radius: 9px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 19px; line-height: 1;
+}
+.dash-card h2 {
+    margin: 0; font-size: 16px; font-weight: 700; color: var(--navy-deep);
+}
+.dash-card:hover h2 { color: var(--blue); }
+.dash-card p { margin: 5px 0 0; font-size: 13.5px; color: var(--text-muted); }
+.dash-body { display: flex; gap: 14px; align-items: flex-start; }
+
+.dash-open {
+    margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--blue);
+    display: flex; align-items: center; gap: 5px;
+}
+
+/* --- status chips --------------------------------------------------------- */
+
+.chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    font-size: 11px; font-weight: 600; letter-spacing: .2px;
+    color: var(--text-subtle);
+    text-transform: lowercase;
+    white-space: nowrap;
+}
+.chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.chip-live   { background: var(--green-bg); border-color: var(--green-line); color: var(--green); }
+.chip-down   { background: var(--amber-bg); border-color: var(--amber-line); color: var(--amber); }
+.chip-admin  { background: var(--blue-bg);  border-color: var(--blue-line);  color: var(--blue-dark); }
+
+/* --- tables --------------------------------------------------------------- */
+
+.table-wrap {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    background: var(--surface);
+}
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead th {
+    text-align: left;
+    padding: 11px 16px;
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    white-space: nowrap;
+}
+tbody td { padding: 13px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--surface-sunk); }
+.cell-strong { font-weight: 600; color: var(--navy-deep); }
+.cell-muted { color: var(--text-muted); }
+.cell-date { white-space: nowrap; color: var(--text-muted); }
+.cell-actions { text-align: right; white-space: nowrap; }
+
+/* Usernames here are often full email addresses, which would otherwise widen
+   the table until the row actions scrolled off the edge. Truncate instead and
+   keep the full value in a title tooltip — every column stays visible. */
+.cell-clip {
+    max-width: 230px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.cell-actions a { font-weight: 500; font-size: 13.5px; }
+.cell-actions .sep { color: var(--border-hard); margin: 0 7px; }
+.link-danger { color: var(--red); }
+.you-tag { color: var(--text-subtle); font-weight: 400; font-size: 12.5px; margin-left: 5px; }
+
+/* --- forms ---------------------------------------------------------------- */
+
+.form-narrow { max-width: 480px; }
+.field { margin-bottom: 18px; }
+.field > label {
+    display: block; margin-bottom: 6px;
+    font-size: 13px; font-weight: 600; color: var(--text);
+}
+.field-check > label {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 14px; font-weight: 500; margin-bottom: 0;
+}
+
+.input {
+    width: 100%;
+    padding: 9px 12px;
+    font-family: inherit;
+    font-size: 14.5px;
+    color: var(--text);
+    background: var(--surface-sunk);
+    border: 1px solid var(--border-hard);
+    border-radius: var(--radius);
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.input:hover { background: var(--surface-alt); }
+.input:focus {
+    outline: none;
+    background: var(--surface);
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px var(--blue-bg);
+}
+.checkbox { width: 16px; height: 16px; accent-color: var(--blue); flex: none; }
+
+.help { margin: 6px 0 0; font-size: 12.5px; color: var(--text-subtle); }
+.help ul { margin: 4px 0 0; padding-left: 18px; }
+.error { margin: 6px 0 0; font-size: 12.5px; color: var(--red); font-weight: 500; }
+
+.form-actions { display: flex; gap: 10px; align-items: center; margin-top: 24px; }
+
+/* --- alerts --------------------------------------------------------------- */
+
+.alert {
+    padding: 11px 15px;
+    border-radius: var(--radius);
+    border: 1px solid;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+.alert-success { background: var(--green-bg); border-color: var(--green-line); color: #216E4E; }
+.alert-error   { background: var(--red-bg);   border-color: var(--red-line);   color: var(--red); }
+.alert-warning { background: var(--amber-bg); border-color: var(--amber-line); color: var(--amber); }
+
+.notice { padding: 28px; text-align: center; color: var(--text-muted); }
+.notice code {
+    background: var(--surface-alt); border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 4px; font-size: 13px;
+}
+
+pre.trace {
+    margin: 16px 0 0; padding: 12px 14px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 12.5px; color: var(--text-muted);
+    overflow-x: auto;
+}
+
+/* --- login ---------------------------------------------------------------- */
+
+body.auth {
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    /* A whisper of the brand gradient, so the sign-in page is unmistakably
+       Excellar without turning the form into decoration. */
+    background:
+        radial-gradient(900px 460px at 50% -8%, rgba(0, 184, 217, .10), transparent 70%),
+        radial-gradient(760px 400px at 50% 108%, rgba(0, 82, 204, .07), transparent 70%),
+        var(--surface);
+}
+.auth-wrap { width: 100%; max-width: 392px; }
+.auth-brand { display: flex; flex-direction: column; align-items: center; gap: 13px; margin-bottom: 26px; }
+.auth-brand img { width: 46px; height: 52px; object-fit: contain; }
+.auth-brand .wordmark { font-size: 27px; }
+.auth-brand p { margin: 0; font-size: 14px; color: var(--text-muted); }
+
+.auth-card { padding: 28px; }
+.auth-card h1 {
+    margin: 0 0 4px; font-size: 19px; font-weight: 700; color: var(--navy-deep);
+}
+.auth-card .lede { margin: 0 0 22px; font-size: 14px; color: var(--text-muted); }
+.auth-card .btn { width: 100%; }
+.auth-foot { margin-top: 20px; text-align: center; font-size: 12.5px; color: var(--text-subtle); }
+
+/* --- responsive ----------------------------------------------------------- */
+
+@media (max-width: 720px) {
+    .site-header { height: auto; padding: 14px 20px; gap: 12px; }
+    .site-nav { gap: 16px; }
+    main { padding: 28px 20px 40px; }
+    .brand-sub { display: none; }
+    .dash-grid { grid-template-columns: 1fr; }
+}

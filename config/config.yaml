@@ -1,0 +1,132 @@
+# wallets:
+#   xlBTC:
+#     address: "0x12900FF4CfF9b4AaA858977013d367375a919c3B"
+#     debank_url: "https://debank.com/profile/0x12900FF4CfF9b4AaA858977013d367375a919c3B"
+#     base_asset: BTC
+#     initial_portfolio_value: 0.03301
+#     funding_account: btc
+#     enabled: true
+#   # xlETH:
+#   #   address: "0xf5c093CF588bC056EC8Ce8b389Be142CEDd27d64"
+#   #   debank_url: "https://debank.com/profile/0xf5c093CF588bC056EC8Ce8b389Be142CEDd27d64"
+#   #   base_asset: ETH
+#   #   initial_portfolio_value: 1.1084
+#   #   funding_account: btc
+#   #   enabled: true
+#   xlUSD:
+#     address: "0xe2618EBA6AcDbCB28deb0F2ab3Fcb2C220d8D0d9"
+#     debank_url: "https://debank.com/profile/0xe2618EBA6AcDbCB28deb0F2ab3Fcb2C220d8D0d9"
+#     base_asset: USDC
+#     initial_portfolio_value: 3336
+#     funding_account: usd
+#     enabled: true
+
+tokens:
+  xlETH:
+    address: "0xea98f791877704116863e56b66414d70ff0b7e65"
+    debank_url: "https://debank.com/profile/0xea98f791877704116863e56b66414d70ff0b7e65"
+    base_asset: ETH
+    initial_portfolio_value: 0
+    funding_account: btc
+    enabled: true
+    price_symbol: "ETH/USDC:USDC"
+  xlBTC:
+    address: "0x48c597e9c0a8ea1e5a5b7199e264eab2fefd7e54"
+    debank_url: "https://debank.com/profile/0x48c597e9c0a8ea1e5a5b7199e264eab2fefd7e54"
+    base_asset: BTC
+    initial_portfolio_value: 0
+    funding_account: btc
+    enabled: true
+    price_symbol: "BTC/USDC:USDC"
+  xlUSD:
+    address: "0x07c1335e5dceecf9594a83c27bdcb977172863f2"
+    debank_url: "https://debank.com/profile/0x07c1335e5dceecf9594a83c27bdcb977172863f2"
+    base_asset: USDC
+    initial_portfolio_value: 0
+    funding_account: usd
+    enabled: true
+    price_symbol: "USDC/USDC:USDC"
+  
+    
+aave:
+  # On-chain Aave v3 markets to read each wallet's borrow/lend + health factor
+  # from via getUserAccountData. RPC URLs are read from the named env var
+  # (keep keys out of source control). Pool addresses are the Aave v3 Pool.
+  markets:
+    - chain: ethereum
+      pool: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+      rpc_url_env: ETH_RPC_URL
+    - chain: arbitrum
+      pool: "0x794a61358D6845594F94dc1DB02A252b5b4814aD"
+      rpc_url_env: ARBITRUM_RPC_URL
+
+spark:
+  # Spark Savings (sUSDS). The sUSDS token held in the wallet IS the position,
+  # so we read each wallet's on-chain sUSDS balanceOf per chain and value it at
+  # the live sUSDS->USDS rate. The rate is global (Sky Savings Rate), so it is
+  # read once from `rate_source` (mainnet sUSDS exposes convertToAssets); chains
+  # whose token lacks that view (e.g. Arbitrum) still value correctly.
+  # RPC URLs come from env (kept out of config.yaml). A market is only queried
+  # if its RPC is set; if the rate_source RPC is unset the rate falls back to
+  # 1.0 (under-values slightly but never over-states).
+  rate_source:
+    chain: ethereum
+    token: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"
+    rpc_url_env: ETH_RPC_URL
+  markets:
+    - chain: arbitrum
+      token: "0xdDb46999F8891663a8F2828d25298f70416d7610"
+      rpc_url_env: ARBITRUM_RPC_URL
+    - chain: ethereum
+      token: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"
+      rpc_url_env: ETH_RPC_URL
+
+vaults:
+  # ERC-4626 vault positions (e.g. MetaMorpho). The share token held in the
+  # wallet IS the position: balanceOf gives raw shares, convertToAssets converts
+  # them to the underlying at the live rate. Queried against the same
+  # BitGo-derived wallet addresses as the Aave and Spark readers, so a vault is
+  # only listed here once — whichever wallet holds it is found automatically.
+  #
+  # asset_decimals is the *underlying* asset's decimals (USDC = 6), not the
+  # share token's: convertToAssets takes raw shares, so share decimals never
+  # enter the maths. share_decimals is display-only.
+  markets:
+    - name: Gauntlet USDC Prime
+      symbol: gtusdcp
+      chain: ethereum
+      vault: "0x8c106eEDaD96553e64287a5a6839c3cc78AFA3D0"
+      asset_symbol: USDC
+      asset_decimals: 6
+      share_decimals: 18
+      rpc_url_env: ETH_RPC_URL
+
+cross_mtm:
+  BTC:
+    entry_cost: 0
+    position_size: 0
+    direction: 1 # 1 is HL - Binance, -1 is Binance - HL
+  ETH:
+    entry_cost: 0
+    position_size: 0
+    direction: 1
+  USDC:
+    entry_cost: 0
+    position_size: 0
+    direction: 1
+
+schedule:
+  snapshot_interval_minutes: 1
+  daily_pnl_hour: 0
+  daily_pnl_minute: 1
+  timezone: UTC
+  # Hour (US Eastern, DST-aware) at which the NAV catalog report is pushed to
+  # Google Sheets/Drive. Overridable via env NAV_REPORT_HOUR_ET.
+  # 17 = 5 PM ET (24-hour clock).
+  report_hour_et: 17
+
+exchange:
+  funding_symbol: "BTC/USDC:USDC"
+  btc_price_symbol: "BTC/USDC:USDC"
+  eth_price_symbol: "ETH/USDC:USDC"
+

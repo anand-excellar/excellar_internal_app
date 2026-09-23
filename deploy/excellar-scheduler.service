@@ -1,0 +1,36 @@
+# NAV's scheduler: periodic snapshots, the daily P&L finalisation and the 5am ET
+# report export. These are Huey periodic tasks (tracker/tasks.py), so they need
+# the consumer running and a reachable Redis.
+#
+# Without this the web app still serves — only the schedule stops.
+
+[Unit]
+Description=Excellar — NAV scheduler (Huey consumer)
+After=network.target redis.service postgresql.service
+Wants=redis.service
+
+[Service]
+Type=simple
+User=excellar
+Group=excellar
+WorkingDirectory=/opt/excellar
+Environment=DJANGO_SETTINGS_MODULE=portal.settings
+
+# --flush-locks clears any lock still held by a worker that was killed mid-task
+# (tracker.tasks pins the snapshot cycle behind one), so a restart always
+# recovers instead of skipping every cycle forever.
+#
+# Stay at one worker. This box has 2 vCPUs and a snapshot cycle saturates them;
+# running two concurrently made each progressively slower (measured: cycles
+# degrading 87s -> 365s, versus a stable ~65s on one worker).
+ExecStart=/opt/excellar/.venv/bin/python manage.py run_huey --flush-locks
+
+Restart=always
+RestartSec=10
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

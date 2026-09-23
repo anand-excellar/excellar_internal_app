@@ -1,0 +1,40 @@
+# The web application: portal login, user management, and both dashboards.
+# Binds 127.0.0.1 — nginx is the only thing that talks to it.
+#
+#   sudo cp deploy/*.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now excellar
+
+[Unit]
+Description=Excellar Dashboards (portal + NAV + CallSpread)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=notify
+User=excellar
+Group=excellar
+WorkingDirectory=/opt/excellar
+Environment=DJANGO_SETTINGS_MODULE=portal.settings
+
+# gthread, not sync: requests block on STS/exchange calls and on Postgres, so
+# threads are what let one worker serve more than one waiting user.
+ExecStart=/opt/excellar/.venv/bin/gunicorn portal.wsgi:application \
+    --bind 127.0.0.1:8080 \
+    --workers 3 \
+    --threads 4 \
+    --worker-class gthread \
+    --timeout 120 \
+    --access-logfile - \
+    --error-logfile -
+
+Restart=always
+RestartSec=3
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/excellar/data /opt/excellar/staticfiles
+
+[Install]
+WantedBy=multi-user.target

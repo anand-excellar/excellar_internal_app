@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Users{% endblock %}
+{% block main_class %}wide{% endblock %}
+
+{% block content %}
+<div class="head-row">
+    <div class="page-head">
+        <h1>Users</h1>
+        <p>Everyone listed here can see every dashboard.</p>
+    </div>
+    <a href="{% url 'user-create' %}" class="btn btn-primary">New user</a>
+</div>
+
+<div class="table-wrap"><div class="table-scroll">
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Last login</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in users %}
+            <tr>
+                <td class="cell-strong cell-clip" title="{{ row.username }}">
+                    {{ row.username }}{% if row == user %}<span class="you-tag">you</span>{% endif %}
+                </td>
+                <td class="cell-muted cell-clip">{{ row.get_full_name|default:"—" }}</td>
+                <td class="cell-muted cell-clip" title="{{ row.email }}">{{ row.email|default:"—" }}</td>
+                <td>
+                    {% if row.is_staff %}
+                        <span class="chip chip-admin">admin</span>
+                    {% else %}
+                        <span class="cell-muted">viewer</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if row.is_active %}
+                        <span class="chip chip-live"><span class="dot"></span>active</span>
+                    {% else %}
+                        <span class="chip">disabled</span>
+                    {% endif %}
+                </td>
+                <td class="cell-date">{{ row.last_login|date:"j M Y, H:i"|default:"never" }}</td>
+                <td class="cell-actions">
+                    <a href="{% url 'user-edit' row.pk %}">Edit</a>
+                    <span class="sep">&middot;</span>
+                    <a href="{% url 'user-password' row.pk %}">Password</a>
+                    {% if row != user %}
+                        <span class="sep">&middot;</span>
+                        <a class="link-danger" href="{% url 'user-delete' row.pk %}">Delete</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div></div>
+{% endblock %}

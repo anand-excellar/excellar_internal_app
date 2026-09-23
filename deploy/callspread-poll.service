@@ -1,0 +1,30 @@
+# CallSpread's STS poller. One process, deliberately: an in-process timer would
+# poll and append history once per gunicorn worker.
+#
+# It writes data/callspread/latest.json (served by /d/callspread/api/state) and
+# appends to data/callspread/history.jsonl.
+
+[Unit]
+Description=Excellar — CallSpread STS poller
+After=network.target excellar.service
+
+[Service]
+Type=simple
+User=excellar
+Group=excellar
+WorkingDirectory=/opt/excellar
+Environment=DJANGO_SETTINGS_MODULE=portal.settings
+
+ExecStart=/opt/excellar/.venv/bin/python manage.py callspread_poll
+
+Restart=always
+RestartSec=10
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/excellar/data
+
+[Install]
+WantedBy=multi-user.target

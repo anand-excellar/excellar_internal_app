@@ -1,0 +1,263 @@
+{% load static %}{% comment %}
+  The CallSpread dashboard's markup, unchanged from the original Node app's
+  public/index.html apart from the two asset paths below and the API-prefix
+  shim. app.js / charts.js / styles.css are byte-identical copies, so the UI
+  is exactly the one that was already in use.
+{% endcomment %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Covered Call Spread Risk Monitor — CC greeks & delta monitor</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📐</text></svg>">
+<link rel="stylesheet" href="{% static 'callspread/styles.css' %}">
+
+<script>
+// Two adaptations that let the original app.js stay byte-identical:
+//
+//   1. It calls /api/... at the origin root, but this dashboard is mounted
+//      under a prefix, so URLs are rewritten here.
+//   2. It was written for the Node server, which had no CSRF protection. Django
+//      rejects an unsafe method without the token, which silently broke the
+//      Settings "Save" and the "Refresh" button — both POST.
+(function () {
+  var P = "{{ mount }}";
+  var TOKEN = "{{ csrf_token }}";
+  var SAFE = /^(GET|HEAD|OPTIONS|TRACE)$/i;
+
+  function fix(u) {
+    if (typeof u !== "string" || u.charAt(0) !== "/") return u;
+    if (u === P || u.indexOf(P + "/") === 0) return u;
+    return P + u;
+  }
+
+  var of = window.fetch;
+  window.fetch = function (input, init) {
+    var url = typeof input === "string" ? fix(input) : input;
+    var opts = init || {};
+    var method = opts.method || (input && input.method) || "GET";
+    if (!SAFE.test(method)) {
+      var headers = new Headers(opts.headers || {});
+      if (!headers.has("X-CSRFToken")) headers.set("X-CSRFToken", TOKEN);
+      opts = Object.assign({}, opts, { headers: headers });
+    }
+    return of.call(this, url, opts);
+  };
+})();
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <h1>Covered Call Spread Risk Monitor</h1>
+    <span class="sub" id="bookLabel">—</span>
+  </div>
+  <span class="chip" id="modeChip"><span class="dot"></span><span id="modeText">…</span></span>
+  <span class="chip" id="clockChip" title="Time since the last successful poll">updated —</span>
+  <div class="seg" role="group" aria-label="Colour theme">
+    <button type="button" id="themeBtn" class="btn icon" title="Toggle light / dark" aria-label="Toggle light / dark">◐</button>
+  </div>
+  <button type="button" class="btn" id="settingsBtn" title="Holdings &amp; policy thresholds">⚙ Settings</button>
+  <button type="button" class="btn" id="refreshBtn">↻ Refresh</button>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ HERO + KPI ============ -->
+  <section class="hero-row section">
+    <div class="hero" id="hero">
+      <span class="label" id="heroLabel">Portfolio blended delta</span>
+      <div class="figure" id="heroValue">—<span class="unit">%</span></div>
+      <div class="figure-sub" id="heroSub">—</div>
+
+      <div class="status-pill" id="statusPill">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true" id="statusIcon"></svg>
+        <span id="statusText">—</span>
+      </div>
+
+      <div class="meter">
+        <div class="meter-track">
+          <div class="meter-fill" id="meterFill" style="width:0%"></div>
+          <div class="meter-mark" id="markFloor"></div>
+          <div class="meter-mark" id="markTarget"></div>
+        </div>
+        <div class="meter-scale"><span>50%</span><span>100%</span></div>
+      </div>
+
+      <div class="hero-actions">
+        <div class="rebal-title">Path back to target</div>
+        <div class="rebal" id="rebal"></div>
+      </div>
+    </div>
+
+    <div class="tiles" id="tiles"></div>
+  </section>
+
+  <!-- ============ P&L ============ -->
+  <div class="section-title">Profit &amp; loss</div>
+  <section class="card section" id="pnlCard">
+    <header>
+      <h2>P&amp;L — options book &amp; underlying</h2>
+      <span class="spacer"></span>
+      <span class="chip" id="pnlSourceChip">—</span>
+    </header>
+    <div class="pnl-grid">
+      <div class="pnl-figs" id="pnlFigs"></div>
+      <div class="pnl-legs">
+        <div class="rebal-title">Breakdown by leg</div>
+        <div class="tbl-scroll"><table class="data" id="pnlTable"></table></div>
+        <div id="pnlNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COVERAGE + SPREAD ============ -->
+  <div class="section-title">Coverage &amp; structure</div>
+  <section class="grid section" style="grid-template-columns: repeat(3, minmax(0,1fr));" id="midRow">
+    <div class="card">
+      <header><h2>CC unit accounting</h2></header>
+      <dl class="kv" id="coverageKv"></dl>
+    </div>
+    <div class="card">
+      <header><h2>Coverage check <span class="spacer"></span></h2><span class="chip" id="coverChip">—</span></header>
+      <dl class="kv" id="coverKv"></dl>
+      <div id="coverMeter" class="cov-meter"></div>
+      <div id="coverNote"></div>
+    </div>
+    <div class="card">
+      <header><h2>Spread economics</h2></header>
+      <dl class="kv" id="spreadKv"></dl>
+      <div id="spreadNote"></div>
+    </div>
+  </section>
+
+  <!-- ============ ROLL SCHEDULE ============ -->
+  <div class="section-title">Roll schedule</div>
+  <section class="card section roll-card" id="rollCard">
+    <header>
+      <h2>Roll catalog</h2>
+      <span class="spacer"></span>
+      <span class="chip" id="rollChip">—</span>
+    </header>
+    <div class="roll-grid">
+      <div class="roll-left">
+        <div class="roll-figure" id="rollFigure">—<span class="unit">d</span></div>
+        <div class="roll-figure-sub" id="rollFigureSub">—</div>
+        <div class="roll-timeline">
+          <div class="rt-track">
+            <div class="rt-fill" id="rtFill"></div>
+            <div class="rt-mark" id="rtMark"></div>
+          </div>
+          <div class="rt-labels">
+            <span id="rtStart">today</span>
+            <span id="rtEnd">expiry</span>
+          </div>
+        </div>
+        <dl class="kv" id="rollKv" style="margin-top:18px"></dl>
+      </div>
+      <div class="roll-right">
+        <div class="rebal-title">Roll ticket — close at current marks</div>
+        <div class="tbl-scroll"><table class="data" id="rollTable"></table></div>
+        <div id="rollNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ POSITIONS ============ -->
+  <div class="section-title">Live positions — per-leg greeks</div>
+  <section class="card section">
+    <header>
+      <h2>STS options book</h2>
+      <span class="spacer"></span>
+      <div class="seg" role="group" aria-label="Greek units">
+        <button type="button" data-units="both" aria-pressed="true">Both</button>
+        <button type="button" data-units="usd" aria-pressed="false">$ only</button>
+        <button type="button" data-units="raw" aria-pressed="false">Raw only</button>
+      </div>
+    </header>
+    <div class="tbl-scroll"><table class="data" id="legsTable"></table></div>
+  </section>
+
+  <!-- ============ AGGREGATION ============ -->
+  <div class="section-title">Portfolio aggregation</div>
+  <section class="grid section" style="grid-template-columns: 1.35fr 1fr;" id="aggRow">
+    <div class="card">
+      <header><h2>Delta sources ($)</h2><span class="spacer"></span><span class="chip" id="spotChip">—</span></header>
+      <div class="tbl-scroll"><table class="data" id="aggTable"></table></div>
+    </div>
+    <div class="card chart-card">
+      <header><h2>Expiry payoff</h2><span class="spacer"></span><span class="unit-note">CC holding + spread, $ vs spot</span></header>
+      <ul class="legend" id="payoffLegend"></ul>
+      <div class="chart-host" id="payoffChart"></div>
+    </div>
+  </section>
+
+  <!-- ============ CHARTS ============ -->
+  <div class="section-title">Greeks over time</div>
+  <div class="filterbar">
+    <div class="seg" role="group" aria-label="Time range" id="rangeSeg">
+      <button type="button" data-range="1h">1H</button>
+      <button type="button" data-range="6h">6H</button>
+      <button type="button" data-range="24h" aria-pressed="true">24H</button>
+      <button type="button" data-range="7d">7D</button>
+      <button type="button" data-range="30d">30D</button>
+      <button type="button" data-range="all">All</button>
+    </div>
+    <span class="chip" id="pointsChip">—</span>
+    <span class="spacer" style="margin-left:auto"></span>
+    <button type="button" class="btn" id="tablesBtn" aria-pressed="false">▦ Table view</button>
+  </div>
+
+  <section class="chart-grid section" id="chartGrid"></section>
+
+  <!-- ============ ALERTS ============ -->
+  <div class="section-title">Monitor rules</div>
+  <section class="card section">
+    <header><h2>Rule evaluation</h2><span class="spacer"></span><span class="chip">notifications not wired yet</span></header>
+    <div class="rules" id="rules"></div>
+    <div class="note">
+      <b>Alerting hook is ready.</b> Each rule below is evaluated on every poll server-side data refresh.
+      Wire a transport (Slack / Telegram / email / webhook) into <code>src/alerts.js</code> and rules
+      will fire on state transitions — tell me the channel and thresholds when you're ready.
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div>Greeks come straight from STS per position — no re-pricing in this dashboard. Raw per-contract greeks are recovered by inverting STS's money-scaling: <code>Delta = Delta $ / (qty × spot)</code>, <code>Gamma = Gamma $ / (qty × 0.01 × spot²)</code>, <code>Vega = Vega $ / qty</code>, <code>Theta = Theta $ / qty</code>.</div>
+    <div><code>Gamma $</code> is the change in <code>Delta $</code> per <b>1% spot move</b>. <code>Vega $</code> is per <b>1 vol point</b>. <code>Theta $</code> is per <b>day</b>. <code>Rho $</code> is per <b>1% rate</b>.</div>
+    <div>Blended delta = net delta (CC units) ÷ total CC held. Coverage reserves the <b>full short-leg notional</b> 1:1 — deliberately stricter than STS's max-loss margin requirement.</div>
+  </footer>
+</main>
+
+<div class="calcpop" id="calcPop" role="tooltip" aria-hidden="true"></div>
+
+<dialog class="settings" id="settingsDlg">
+  <form method="dialog">
+    <div class="body">
+      <h3>Holdings &amp; policy</h3>
+      <p>CC held off STS is not visible to the API — set it here. STS-side CC (margin posted) and unconverted premium are detected automatically.</p>
+      <div class="field"><label for="fCustody">Undeployed CC at custody (units)</label><input type="number" id="fCustody" step="1"></div>
+      <div class="field"><label for="fVenue">Custody venue label</label><input type="text" id="fVenue" style="text-align:left"></div>
+      <p>Underlying P&amp;L — the CC itself is bought off-STS, so its entry price and acquisition cost aren't visible to the API and must be set here.</p>
+      <div class="field"><label for="fRefSpot">Reference spot (when the covered call book was opened)</label><input type="number" id="fRefSpot" step="any" min="0"></div>
+      <div class="field"><label for="fAcqCost">Cost of acquiring the underlying (total $, off-STS fees/slippage)</label><input type="number" id="fAcqCost" step="0.01" min="0"></div>
+      <div class="field"><label for="fFloor">Hard floor (blended delta)</label><input type="number" id="fFloor" step="0.01" min="0" max="1"></div>
+      <div class="field"><label for="fBuffer">Warning buffer</label><input type="number" id="fBuffer" step="0.005" min="0" max="1"></div>
+      <div class="field"><label for="fTarget">Target delta</label><input type="number" id="fTarget" step="0.01" min="0" max="1"></div>
+      <div class="field"><label for="fUpper">Upper band</label><input type="number" id="fUpper" step="0.01" min="0" max="1"></div>
+      <div class="field"><label for="fCoverage">Coverage ratio (× short notional)</label><input type="number" id="fCoverage" step="0.05" min="0"></div>
+      <div class="field"><label for="fRoll">Roll this many days before expiry</label><input type="number" id="fRoll" step="1" min="0"></div>
+      <div class="field"><label for="fRollWarn">Warn this many days before the roll date</label><input type="number" id="fRollWarn" step="1" min="0"></div>
+    </div>
+    <footer>
+      <button type="submit" value="cancel" class="btn">Cancel</button>
+      <button type="submit" value="save" class="btn primary" id="saveSettings">Save</button>
+    </footer>
+  </form>
+</dialog>
+
+<script type="module" src="{% static 'callspread/app.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+[
+  {
+    "ReportDate": "2026-08-09T00:00:00Z",
+    "Account": "XLBTC Cold on BTC - BTC",
+    "Currency": "Bitcoin",
+    "CurrencyCode": "BTC",
+    "NativeValueEndBalance": 0.08947532,
+    "BaseValueEndBalance": 0.08947532,
+    "ExchangeRate": 65095.57,
+    "Source": "Balance",
+    "InstrumentType": "CRYPTO CURRENCY"
+  },
+  {
+    "ReportDate": "2026-08-09T00:00:00Z",
+    "Account": "XLBTC COLD ON ETHEREUM - WBTC ETH GAS FEE",
+    "Currency": "ETH_Gas",
+    "CurrencyCode": "ETH_GAS",
+    "NativeValueEndBalance": 0.01,
+    "BaseValueEndBalance": 0.0002949172,
+    "ExchangeRate": 0.029491715,
+    "Source": "Balance",
+    "InstrumentType": "CRYPTO CURRENCY"
+  },
+  {
+    "ReportDate": "2026-08-09T00:00:00Z",
+    "Account": "XLBTC Hot Wallet on Arbitrum",
+    "Currency": "USDC",
+    "CurrencyCode": "USDC",
+    "NativeValueEndBalance": 50.042206,
+    "BaseValueEndBalance": 0.0007689786,
+    "ExchangeRate": 1.53666e-05,
+    "Source": "Balance",
+    "InstrumentType": "STABLECOIN"
+  },
+  {
+    "ReportDate": "2026-08-09T00:00:00Z",
+    "Account": "XLBTC HOT WALLET ON ARBITRUM ETH GAS FEE",
+    "Currency": "ETH_Gas",
+    "CurrencyCode": "ETH_GAS",
+    "NativeValueEndBalance": 0.029975,
+    "BaseValueEndBalance": 0.0008840142,
+    "ExchangeRate": 0.029491715,
+    "Source": "Balance",
+    "InstrumentType": "CRYPTO CURRENCY"
+  },
+  {
+    "ReportDate": "2026-08-09T00:00:00Z",
+    "Account": "XLBTC Hot Wallet on Ethereum",
+    "Currency": "USDC",
+    "CurrencyCode": "USDC",
+    "NativeValueEndBalance": 18.643394,
+    "BaseValueEndBalance": 0.0002864856,
+    "ExchangeRate": 1.53666e-05,
+    "Source": "Balance",
+    "InstrumentType": "STABLECOIN"
+  },
+  {
+    "ReportDate": "2026-08-09T00:00:00Z",
+    "Account": "XLBTC HOT WALLET ON ETHEREUM ETH GAS FEE",
+    "Currency": "ETH_Gas",
+    "CurrencyCode": "ETH_GAS",
+    "NativeValueEndBalance": 0.044576,
+    "BaseValueEndBalance": 0.0013146227,
+    "ExchangeRate": 0.029491715,
+    "Source": "Balance",
+    "InstrumentType": "CRYPTO CURRENCY"
+  }
+]

@@ -1,0 +1,54 @@
+{% if summary %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {% for row in summary %}
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+
+        <div class="flex justify-between items-start mb-4">
+            <h3 class="font-semibold text-blue-400 text-sm uppercase tracking-widest">{{ row.segment }}</h3>
+            <span class="text-gray-600 text-xs font-mono">{{ row.date }}</span>
+        </div>
+
+        {# --- Performance --- #}
+        <p class="text-xs text-gray-600 uppercase tracking-wider mb-1">Performance (Since Inception)</p>
+        <dl class="space-y-1.5 text-sm mb-4">
+            <div class="flex justify-between">
+                <dt class="text-gray-400">Portfolio Value</dt>
+                <dd class="font-mono font-semibold">{{ row.portfolio_value|floatformat:6|default:"—" }}</dd>
+            </div>
+            <div class="flex justify-between">
+                <dt class="text-gray-400">Annualized Return</dt>
+                <dd class="font-mono {% if row.annualized_pct >= 0 %}text-green-400{% else %}text-red-400{% endif %}">
+                    {% if row.annualized_pct >= 0 %}+{% endif %}{{ row.annualized_pct|floatformat:2 }}%
+                </dd>
+            </div>
+        </dl>
+
+        {# --- Drawdown --- #}
+        <p class="text-xs text-gray-600 uppercase tracking-wider mb-1">Drawdown</p>
+        <dl class="space-y-1.5 text-sm">
+            <div class="flex justify-between">
+                <dt class="text-gray-400">Peak Value</dt>
+                <dd class="font-mono text-gray-300">{{ row.rolling_max|floatformat:6|default:"—" }}</dd>
+            </div>
+            <div class="flex justify-between items-center">
+                <dt class="text-gray-400">From Peak
+                    <span class="text-gray-600 text-xs ml-1" title="(Current − Peak) / Peak × 100">ⓘ</span>
+                </dt>
+                <dd class="font-mono font-semibold
+                    {% if row.drawdown_pct < -5 %}text-red-400
+                    {% elif row.drawdown_pct < 0 %}text-yellow-400
+                    {% else %}text-green-400{% endif %}">
+                    {% if row.drawdown_pct >= 0 %}+{% endif %}{{ row.drawdown_pct|floatformat:2 }}%
+                </dd>
+            </div>
+        </dl>
+
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="rounded-xl border border-gray-800 bg-gray-900 px-5 py-8 text-center">
+    <p class="text-gray-500 text-sm">No portfolio data yet.</p>
+    <p class="text-gray-600 text-xs mt-1">Run <code class="text-gray-500">finalize_daily</code> after the first snapshot cycle completes.</p>
+</div>
+{% endif %}

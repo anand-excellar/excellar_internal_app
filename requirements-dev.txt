@@ -1,0 +1,10 @@
+-r requirements.txt
+
+# Only needed for tests/e2e_browser.py. After installing, run `playwright install
+# chromium` — or point --chrome / CHROME_PATH at a Chromium you already have.
+playwright>=1.40
+# Test runner. `pytest` runs everything — the NAV suite is pytest-based and
+# pytest also collects the Django TestCase classes.
+pytest>=8.0
+pytest-django>=4.8
+pytest-asyncio>=0.23

@@ -1,0 +1,37 @@
+{
+  "book": {
+    "baseCurrency": "CC",
+    "quoteCurrency": "USDT",
+    "label": "CC covered call spread — 21AUG26"
+  },
+  "externalHoldings": {
+    "_comment": "CC held OFF STS (custody / BitGo etc). Free, unencumbered, immediately transferable. STS-side CC (margin posted) is auto-detected from the STS spot balance and must NOT be repeated here.",
+    "custodyCcUnits": 9000,
+    "venue": "Custody (BitGo)"
+  },
+  "underlyingPnl": {
+    "_comment": "P&L on the CC you hold (margin + custody + pending), which STS cannot see. referenceSpot is the spot price when the covered call book was opened — set once from the Settings panel. acquisitionCost is the total $ paid in fees/slippage to acquire the CC off-STS, entered manually.",
+    "referenceSpot": null,
+    "acquisitionCost": 0
+  },
+  "policy": {
+    "_comment": "Coverage + delta thresholds. blendedDelta = netDeltaCcUnits / totalCcHeld.",
+    "coverageRatio": 1,
+    "coverageWarnBuffer": 0.005,
+    "rollDaysBeforeExpiry": 14,
+    "rollApproachDays": 3,
+    "hardFloor": 0.7,
+    "warningBuffer": 0.02,
+    "target": 0.8,
+    "upperBand": 0.95
+  },
+  "polling": {
+    "intervalSeconds": 60,
+    "historyRetentionDays": 30,
+    "_comment": "How often the poller refreshes from STS, and how much snapshot history to keep. Poll interval is also surfaced to the browser so the page can count down to the next refresh."
+  },
+  "display": {
+    "quoteSymbol": "$",
+    "spotPrecision": 6
+  }
+}

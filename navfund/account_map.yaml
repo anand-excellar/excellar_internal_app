@@ -1,0 +1,196 @@
+# NAV Fund Services account  ->  our Detail-tab (category, location)
+#
+# NAV splits one of our wallets across several accounts: the wallet itself plus
+# separate "... ETH GAS FEE" / "..._GAS" / "..._REWARD_BOOST" accounts, and for
+# xlUSD a hex suffix (_63F2, _C7A3) naming which wallet's address the gas belongs
+# to. Every one of those maps back to the single label we already show, so they
+# roll up into it.
+#
+# `category` must be one of our Detail-tab categories (see `categories:` below);
+# `location` must match our Location column exactly. `tickers:` renames NAV's
+# ticker to ours where they differ — NAV books a wallet's native gas coin as
+# `ETH_GAS`, which is `ARBETH` on Arbitrum and `ETH` on mainnet.
+#
+# `ticker_overrides:` handles the case where one NAV account holds tickers that
+# belong to *different* categories on our side: NAV keeps the Spark sUSDS
+# position inside the Arbitrum wallet account, while we report it under its own
+# "Spark Savings" category. (aTokens are deliberately NOT overridden — we keep
+# them on the wallet row, unpriced, with Aave valued separately.)
+#
+# Mappings marked "ties" were confirmed by NAV's quantity matching ours exactly
+# on the same position. Accounts deliberately left out appear in the report's
+# unmapped block rather than being guessed at — see `unmapped_notes` at the end.
+
+# Exactly the Category values our Detail tab emits (read off a generated report).
+categories:
+  - Native reserve
+  - Aave position
+  - Spark Savings
+  - Exchange funds & perp exposure
+
+segments:
+
+  xlBTC:
+    fund_name: XLBTC SA
+    global_fund_id: 247833
+    base_asset: BTC
+    accounts:
+      "XLBTC Hot Wallet on Arbitrum":                 # ties: USDC 50.042206
+        category: Native reserve
+        location: "xlBTC Hot Wallet Arbitrum · arbeth"
+      "XLBTC HOT WALLET ON ARBITRUM ETH GAS FEE":     # ties: 0.029975 = our ARBETH
+        category: Native reserve
+        location: "xlBTC Hot Wallet Arbitrum · arbeth"
+        tickers: {ETH_GAS: ARBETH}
+      "XLBTC Hot Wallet on Ethereum":                 # ties: USDC 18.643394, AETHWBTC 0.003991
+        category: Native reserve
+        location: "xlBTC Hot Wallet · eth"
+        tickers: {AETHWBTC: "ETH:AETHWBTC"}
+      "XLBTC HOT WALLET ON ETHEREUM ETH GAS FEE":     # ties: 0.044576 = our ETH
+        category: Native reserve
+        location: "xlBTC Hot Wallet · eth"
+        tickers: {ETH_GAS: ETH}
+      "XLBTC COLD ON ETHEREUM - WBTC ETH GAS FEE":    # ties: 0.01 = our ETH
+        category: Native reserve
+        location: "xlBTC Reserves -wBTC · eth"
+        tickers: {ETH_GAS: ETH}
+      "XLBTC Cold on BTC - BTC":
+        category: Native reserve
+        location: "xlBTC Reserves - BTC · btc"
+      "XLBTC COLD ON BTC_REWARD_BOOST":               # staking reward on the cold BTC
+        category: Native reserve
+        location: "xlBTC Reserves - BTC · btc"
+        tickers: {BTC_GAS: BTC}
+      "XLBTC_BINANCE SUB":
+        category: Exchange funds & perp exposure
+        location: Binance
+      "XLBTC_BINANCE SUB_GAS":
+        category: Exchange funds & perp exposure
+        location: Binance
+        tickers: {BTC_GAS: BTC}
+      "XLBTC_DERIBIT":
+        category: Exchange funds & perp exposure
+        location: Deribit
+      "XLBTC_DERIBIT_gas":
+        category: Exchange funds & perp exposure
+        location: Deribit
+        tickers: {BTC_GAS: BTC}
+      "XLBTC_Hyperliquid":                            # ties: USDC 0.000001
+        category: Exchange funds & perp exposure
+        location: Hyperliquid
+
+  xlETH:
+    fund_name: XLETH SA
+    global_fund_id: 247834
+    base_asset: ETH
+    accounts:
+      "XLETH Hot Wallet on Arbitrum":                 # ties: USDC 49.8
+        category: Native reserve
+        location: "xlETH Hot Wallet Arbitrum · arbeth"
+        tickers: {ETH: ARBETH}
+      "XLETH_Hot Wallet on Arbitrum ETH GAS FEES":
+        category: Native reserve
+        location: "xlETH Hot Wallet Arbitrum · arbeth"
+        tickers: {ETH_GAS: ARBETH}
+      "XLETH Hot Wallet on Ethereum":                 # ties: USDC 3.677877, AETHWETH ~0.1203
+        category: Native reserve
+        location: "xlETH Hot Wallet · eth"
+        tickers: {AETHWETH: "ETH:AETHWETH"}
+      "XLETH_HW On Ethrm ETH GAS FEES":
+        category: Native reserve
+        location: "xlETH Hot Wallet · eth"
+        tickers: {ETH_GAS: ETH}
+      "XLETH Cold on Ethereum-ETH":
+        category: Native reserve
+        location: "xlETH Reserves - ETH · eth"
+      "XLETH_Cold Wallet ETH GAS FEES":
+        category: Native reserve
+        location: "xlETH Reserves - ETH · eth"
+        tickers: {ETH_GAS: ETH}
+      # NAV's xlETH Binance accounts use an XETH_ prefix, not XLETH_.
+      "XETH_BINANCE SUB":
+        category: Exchange funds & perp exposure
+        location: Binance
+      "XLETH_ETH GAS FEES_Binance":
+        category: Exchange funds & perp exposure
+        location: Binance
+        tickers: {ETH_GAS: ETH}
+      "XLETH_Hyperliquid":                            # ties: USDC 0.130967
+        category: Exchange funds & perp exposure
+        location: Hyperliquid
+      # Aave borrow legs — confirmed by Aashish 2026-08-14. Both read 0 on the
+      # sample date, so the sign/direction is still worth a look the first time
+      # either goes non-zero.
+      "XLETH_BORROWING_Bitgo":
+        category: Aave position
+        location: Aave
+      "XLETH_Borrowing_6986":
+        category: Aave position
+        location: Aave
+
+  xlUSD:
+    fund_name: XLUSD SA
+    global_fund_id: 247832
+    base_asset: USDC
+    accounts:
+      "XLUSD Hot Wallet on Arbitrum":
+        category: Native reserve
+        location: "xlUSD Hot Wallet Arbitrum · arbeth"
+        ticker_overrides:
+          # We report Spark under its own category, located by chain, with the
+          # asset spelled sUSDS — NAV keeps it inside the Arbitrum wallet.
+          SUSDS:
+            category: Spark Savings
+            location: Arbitrum
+            our_asset: sUSDS
+      "XLUSD_ETH GAS FEES_63F2":                      # ties: 0.029973 = our ARBETH
+        category: Native reserve
+        location: "xlUSD Hot Wallet Arbitrum · arbeth"
+        tickers: {ETH_GAS: ARBETH}
+      "XLUSD Hot Wallet on Ethereum":
+        category: Native reserve
+        location: "xlUSD Hot Wallet · eth"
+      "XLUSD_ETH GAS FEES_C7A3":                      # ties: 0.04 = our ETH
+        category: Native reserve
+        location: "xlUSD Hot Wallet · eth"
+        # USDC_GAS is part of the wallet's USDC, not a separate holding: on
+        # 08-13-2026 NAV showed USDC 2508.13186700 + USDC_GAS 99.09000000, which
+        # is our single USDC balance of 2607.22186700 exactly.
+        tickers: {ETH_GAS: ETH, USDC_GAS: USDC}
+      "EX USD_XLUSD_BITGO":                           # ties: USDC 500 exactly
+        category: Native reserve
+        location: "xlUSD Reserves - USDC · eth"
+      "XLUSD_ETH GAS FEES":                           # ties: 0.009732 = our ETH
+        category: Native reserve
+        location: "xlUSD Reserves - USDC · eth"
+        tickers: {ETH_GAS: ETH}
+      "XLUSD Cold on Stellar-USDC":                   # ties: XLM 4.99996
+        category: Native reserve
+        location: "xlUSD Reserves - Stellar USDC · xlm"
+      "XLUSD_BINANCE SUB":
+        category: Exchange funds & perp exposure
+        location: Binance
+      "XLUSD_Hyperliquid":
+        category: Exchange funds & perp exposure
+        location: Hyperliquid
+
+# NAV accounts/tickers intentionally NOT mapped yet, and why. Each shows up in
+# the report's unmapped block with its value, so nothing is silently dropped.
+unmapped_notes:
+  "EX BTC_XLBTC_BITGO": >
+    Confirmed by Aashish 2026-08-14: the real cold BTC is "XLBTC Cold on BTC -
+    BTC", so this account stays unmapped. It holds 1e-8 of dust; mapping it to
+    the cold wallet as well would double-count.
+  "XLETH_ETH GAS FEES": >
+    Sits at -1e-8 with no wallet suffix to identify it, unlike the xlUSD gas
+    accounts which carry a _63F2/_C7A3 address fragment. Needs NAV to say which
+    wallet it belongs to.
+
+# Mapped, but worth confirming with NAV. These are documentation only — they do
+# carry into the report, so they show up as a difference rather than as unmapped.
+review_notes:
+  "XLUSD_ETH GAS FEES_C7A3 / USDC_GAS": >
+    RESOLVED 2026-08-14 by the reconciliation itself, no question to NAV needed:
+    USDC_GAS is part of the wallet's USDC, not a separate asset. NAV's
+    USDC 2508.13186700 + USDC_GAS 99.09000000 equals our single USDC balance of
+    2607.22186700. Now aliased to USDC so the two rows collapse into one.

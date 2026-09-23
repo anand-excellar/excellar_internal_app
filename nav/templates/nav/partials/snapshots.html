@@ -1,0 +1,112 @@
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {% for seg, snap in snapshots.items %}
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+
+        {# --- Header --- #}
+        <div class="flex justify-between items-start mb-4">
+            <h3 class="font-semibold text-blue-400 text-sm uppercase tracking-widest">{{ seg }}</h3>
+            {% if snap %}
+            <span class="text-gray-600 text-xs font-mono">{{ snap.timestamp|date:"H:i" }} UTC</span>
+            {% endif %}
+        </div>
+
+        {% if snap %}
+
+        {# --- Market Prices --- #}
+        <p class="text-xs text-gray-600 uppercase tracking-wider mb-1">Market Prices</p>
+        <dl class="space-y-1.5 text-sm mb-4">
+            <div class="flex justify-between">
+                <dt class="text-gray-400">BTC</dt>
+                <dd class="font-mono">${{ snap.btc_price|floatformat:0|default:"—" }}</dd>
+            </div>
+            {% if snap.eth_price is not None %}
+            <div class="flex justify-between">
+                <dt class="text-gray-400">ETH</dt>
+                <dd class="font-mono">${{ snap.eth_price|floatformat:0|default:"—" }}</dd>
+            </div>
+            {% endif %}
+        </dl>
+
+        {# --- Deployed Positions --- #}
+        <p class="text-xs text-gray-600 uppercase tracking-wider mb-1">Deployed Positions</p>
+        <dl class="space-y-1.5 text-sm mb-4">
+            {% if snap.aave_borrow_usdc is not None %}
+            <div class="flex justify-between">
+                <dt class="text-gray-400">AAVE Borrow</dt>
+                <dd class="font-mono text-orange-300">{{ snap.aave_borrow_usdc|floatformat:0 }} USDC</dd>
+            </div>
+            {% endif %}
+            {% if snap.susds_eth_balance is not None %}
+            <div class="flex justify-between">
+                <dt class="text-gray-400">sUSDS (Ethereum)</dt>
+                <dd class="font-mono">{{ snap.susds_eth_balance|floatformat:0 }} USD</dd>
+            </div>
+            {% endif %}
+            {% if snap.susds_arbi_balance is not None %}
+            <div class="flex justify-between">
+                <dt class="text-gray-400">sUSDS (Arbitrum)</dt>
+                <dd class="font-mono">{{ snap.susds_arbi_balance|floatformat:0 }} USD</dd>
+            </div>
+            {% endif %}
+            {% if snap.aave_borrow_usdc is None and snap.susds_eth_balance is None and snap.susds_arbi_balance is None %}
+            <div class="text-gray-600 text-xs">No position data yet</div>
+            {% endif %}
+        </dl>
+
+        {# --- Risk Indicators --- #}
+        {% if snap.aave_health_rate is not None %}
+        <p class="text-xs text-gray-600 uppercase tracking-wider mb-1">Risk</p>
+        <dl class="space-y-1.5 text-sm mb-4">
+            <div class="flex justify-between items-center">
+                <dt class="text-gray-400">AAVE Health Factor
+                    <span class="text-gray-600 text-xs ml-1" title="Liquidation risk — must stay above 1.0">ⓘ</span>
+                </dt>
+                <dd class="font-mono font-semibold
+                    {% if snap.aave_health_rate >= 2.0 %}text-green-400
+                    {% elif snap.aave_health_rate >= 1.5 %}text-yellow-400
+                    {% else %}text-red-400{% endif %}">
+                    {{ snap.aave_health_rate|floatformat:2 }}
+                    {% if snap.aave_health_rate < 1.5 %} ⚠{% endif %}
+                </dd>
+            </div>
+        </dl>
+        {% endif %}
+
+        {# --- Today's P&L --- #}
+        <p class="text-xs text-gray-600 uppercase tracking-wider mb-1">Today's P&amp;L</p>
+        <dl class="space-y-1.5 text-sm">
+            <div class="flex justify-between">
+                <dt class="text-gray-400">Net P&amp;L</dt>
+                <dd class="font-mono font-semibold
+                    {% if snap.pnl_usdc != None and snap.pnl_usdc >= 0 %}text-green-400{% else %}text-red-400{% endif %}">
+                    {% if snap.pnl_usdc != None %}
+                        {% if snap.pnl_usdc >= 0 %}+{% endif %}{{ snap.pnl_usdc|floatformat:4 }} USDC
+                    {% else %}—{% endif %}
+                </dd>
+            </div>
+            {% if snap.cross_mtm_value is not None %}
+            <div class="flex justify-between">
+                <dt class="text-gray-400">Cross-Exchange PnL
+                    <span class="text-gray-600 text-xs ml-1" title="Mark-to-market on cross-exchange perp position">ⓘ</span>
+                </dt>
+                <dd class="font-mono text-gray-300">{{ snap.cross_mtm_value|floatformat:4 }} USDC</dd>
+            </div>
+            {% endif %}
+            {% if snap.funding_cumulative is not None %}
+            <div class="flex justify-between">
+                <dt class="text-gray-400">Funding (today)</dt>
+                <dd class="font-mono
+                    {% if snap.funding_cumulative >= 0 %}text-green-300{% else %}text-red-300{% endif %}">
+                    {% if snap.funding_cumulative >= 0 %}+{% endif %}{{ snap.funding_cumulative|floatformat:4 }} USDC
+                </dd>
+            </div>
+            {% endif %}
+        </dl>
+
+        {% else %}
+        <p class="text-gray-600 text-sm mt-4">No data — run <code class="text-gray-500">take_snapshot</code></p>
+        {% endif %}
+
+    </div>
+    {% endfor %}
+</div>
